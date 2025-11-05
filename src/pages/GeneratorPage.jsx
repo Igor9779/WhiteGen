@@ -1,6 +1,13 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import "./GeneratorPage.css";
 import GeneratorHeader from "../components/GeneratorHeader";
+import {
+  downloadArchive,
+  generateLanding,
+  getAllArchives,
+} from "../api/filesApi";
 
 export default function GeneratorPage() {
   const [status, setStatus] = useState("⏳ Очікування запуску...");
@@ -18,33 +25,46 @@ export default function GeneratorPage() {
   }
 ]`);
 
+  // 🔹 Мутація для запуску генерації лендингів
+  const mutation = useMutation({
+    mutationFn: generateLanding,
+    onSuccess: (data) => {
+      toast.success("✅ Генерація успішно запущена!");
+      console.log("Server response:", data);
+      setStatus("✅ Генерація завершена, можна завантажити архів");
+
+      // якщо бекенд повертає whiteId — додаємо архів у список
+      if (data.whiteId) {
+        setArchives((prev) => [
+          ...prev,
+          { name: `${data.whiteId}.zip`, sites: [] },
+        ]);
+      }
+    },
+    onError: (err) => {
+      const msg = err.response?.data?.message || "🚨 Помилка при генерації";
+      toast.error(msg);
+      setStatus("❌ Помилка при генерації");
+    },
+  });
+
+  // 🔸 Обробка форми
   const handleGenerate = async (e) => {
     e.preventDefault();
     setStatus("⏳ Генерація запущена...");
+
     const form = e.target;
-
-    const formData = {
-      clickupfile: form.clickupfile.checked,
-      twbs: form.twbs.value,
-      commandnumber: form.commandnumber.value,
-      tasknumber: form.tasknumber.value,
-      taskid: form.taskid.value,
-      language: form.language.value,
-      geo: form.geo.value,
-      json: [],
-    };
-
-    // 🔹 Перевіряємо JSON
     let parsed;
+
     try {
       parsed = JSON.parse(themesText);
     } catch {
-      setStatus("❌ Некоректний JSON у полі 'Теми сайтів'");
+      toast.error("❌ Некоректний JSON у полі 'Теми сайтів'");
       return;
     }
 
     if (!Array.isArray(parsed)) {
-      setStatus("❌ JSON має бути масивом об’єктів");
+      toast.error("❌ JSON має бути масивом об’єктів");
       return;
     }
 
@@ -57,38 +77,26 @@ export default function GeneratorPage() {
     );
 
     if (!isValid) {
-      setStatus(
+      toast.error(
         "❌ Кожен об’єкт має містити поля: domain, name_theme, brand_name"
       );
       return;
     }
 
-    formData.json = parsed;
+    const payload = {
+      clickup: form.clickupfile.checked,
+      senClickupFile: form.sentclickupfile?.checked || false,
+      tw: form.twbs.value === "Tailwind",
+      task: form.commandnumber.value,
+      lang: form.language.value,
+      team: form.tasknumber.value,
+      task_id: form.taskid.value,
+      geo: form.geo.value,
+      themes: parsed,
+    };
 
-    // 🔹 Імітація бекенду: створення одного архіву tasknumber.zip
-    setStatus("⚙️ Генерація сайтів...");
-    setTimeout(() => {
-      const taskZip = `${formData.tasknumber}.zip`;
-
-      // імітуємо структуру файлів усередині архіву
-      const internalFiles = parsed.map(
-        (item) => `${item.domain}_${formData.tasknumber}`
-      );
-
-      console.log("🧩 Вміст архіву:", internalFiles);
-
-      setArchives((prev) => [...prev, { name: taskZip, sites: internalFiles }]);
-      setStatus(`✅ Створено архів ${taskZip} із ${parsed.length} сайт(ами)`);
-    }, 1500);
-
-    // 🔹 У майбутньому тут буде реальний бекенд:
-    /*
-    const res = await fetch("http://localhost:5000/run", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    */
+    console.log("📤 Відправляємо payload:", payload);
+    mutation.mutate(payload);
   };
 
   return (
@@ -103,6 +111,14 @@ export default function GeneratorPage() {
             <div className="form-group">
               <label>
                 <input id="clickupfile" name="clickupfile" type="checkbox" />{" "}
+                Clickup
+              </label>
+              <label>
+                <input
+                  id="sentclickupfile"
+                  name="sentclickupfile"
+                  type="checkbox"
+                />{" "}
                 Sent Clickup File
               </label>
             </div>
@@ -149,8 +165,12 @@ export default function GeneratorPage() {
               <input name="geo" type="text" placeholder="CH" required />
             </div>
 
-            <button type="submit" className="btn generate-btn">
-              ▶️ Генерувати
+            <button
+              type="submit"
+              className="btn generate-btn"
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? "⚙️ Генерація..." : "▶️ Генерувати"}
             </button>
           </form>
 
@@ -173,20 +193,29 @@ export default function GeneratorPage() {
         {archives.length > 0 && (
           <section className="column column-right">
             <h3>Сгенеровані архіви</h3>
-            <ul>
-              {archives.map((archive, index) => (
-                <li key={index} className="archive-item">
-                  <a href="#" download>
-                    📦 {archive.name}
-                  </a>
-                  <ul className="sub-list">
-                    {archive.sites.map((site, i) => (
-                      <li key={i}>└─ {site}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
+
+            {isArchivesLoading && <p>⏳ Завантаження архівів...</p>}
+            {isArchivesError && <p>❌ Помилка при отриманні архівів</p>}
+
+            {archives.length > 0 ? (
+              <ul>
+                {archives.map((archive, index) => (
+                  <li key={index} className="archive-item">
+                    <button
+                      className="download-btn"
+                      onClick={() => downloadArchive(archive.name)}
+                    >
+                      📦 Завантажити {archive.name}.zip
+                    </button>
+                    <p className="archive-meta">
+                      🕒 {new Date(archive.createdAt).toLocaleString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              !isArchivesLoading && <p>Архівів ще немає</p>
+            )}
           </section>
         )}
       </main>
