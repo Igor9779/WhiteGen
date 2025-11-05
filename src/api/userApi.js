@@ -25,6 +25,6 @@ export const logoutUser = async () => {
 };
 
 export const checkAuth = async () => {
-  const res = await api.get("/auth/check-auth");
+  const res = await api.post("/auth/check-auth");
   return res.data;
 };
