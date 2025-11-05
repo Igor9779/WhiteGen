@@ -25,7 +25,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         // 🔹 пробуємо оновити токен
-        await refreshApi.get("/auth/refresh");
+        await refreshApi.post("/auth/refresh");
         // 🔹 після оновлення — повторюємо початковий запит
         return api(originalRequest);
       } catch (refreshError) {
