@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://gen-web-serv.onrender.com";
 
 // 🔹 Базовий екземпляр axios
 export const api = axios.create({
