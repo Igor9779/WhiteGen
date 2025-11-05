@@ -12,6 +12,7 @@ import {
 export default function GeneratorPage() {
   const [status, setStatus] = useState("⏳ Очікування запуску...");
   const [archives, setArchives] = useState([]);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [themesText, setThemesText] = useState(`[
   {
     "domain": "WhiteGen.com",
@@ -25,19 +26,24 @@ export default function GeneratorPage() {
   }
 ]`);
 
+  // 🔹 Завантаження архівів при відкритті сторінки
+  const { isLoading: isArchivesLoading, isError: isArchivesError } = useQuery({
+    queryKey: ["archives"],
+    queryFn: getAllArchives,
+    onSuccess: (data) => setArchives(data),
+    onError: () => toast.error("❌ Не вдалося отримати архіви користувача"),
+  });
+
   // 🔹 Мутація для запуску генерації лендингів
   const mutation = useMutation({
     mutationFn: generateLanding,
     onSuccess: (data) => {
       toast.success("✅ Генерація успішно запущена!");
-      console.log("Server response:", data);
       setStatus("✅ Генерація завершена, можна завантажити архів");
-
-      // якщо бекенд повертає whiteId — додаємо архів у список
       if (data.whiteId) {
         setArchives((prev) => [
           ...prev,
-          { name: `${data.whiteId}.zip`, sites: [] },
+          { name: `${data.whiteId}.zip`, createdAt: new Date().toISOString() },
         ]);
       }
     },
@@ -95,8 +101,20 @@ export default function GeneratorPage() {
       themes: parsed,
     };
 
-    console.log("📤 Відправляємо payload:", payload);
     mutation.mutate(payload);
+  };
+
+  // 🔹 Завантаження архіву з блокуванням кнопки
+  const handleDownload = async (whiteId) => {
+    setIsDownloading(true);
+    try {
+      await downloadArchive(whiteId);
+    } catch (err) {
+      toast.error("❌ Не вдалося завантажити архів");
+      console.error(err);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -168,9 +186,13 @@ export default function GeneratorPage() {
             <button
               type="submit"
               className="btn generate-btn"
-              disabled={mutation.isPending}
+              disabled={mutation.isPending || isDownloading}
             >
-              {mutation.isPending ? "⚙️ Генерація..." : "▶️ Генерувати"}
+              {mutation.isPending
+                ? "⚙️ Генерація..."
+                : isDownloading
+                ? "📦 Завантаження..."
+                : "▶️ Генерувати"}
             </button>
           </form>
 
@@ -181,7 +203,6 @@ export default function GeneratorPage() {
         <section className="column column-center">
           <h3>Теми сайтів (JSON формат)</h3>
           <p className="hint">Вставте масив об’єктів у форматі:</p>
-
           <textarea
             rows="18"
             value={themesText}
@@ -190,34 +211,33 @@ export default function GeneratorPage() {
         </section>
 
         {/* 🔹 Праворуч — історія архівів */}
-        {archives.length > 0 && (
-          <section className="column column-right">
-            <h3>Сгенеровані архіви</h3>
+        <section className="column column-right">
+          <h3>Сгенеровані архіви</h3>
 
-            {isArchivesLoading && <p>⏳ Завантаження архівів...</p>}
-            {isArchivesError && <p>❌ Помилка при отриманні архівів</p>}
+          {isArchivesLoading && <p>⏳ Завантаження архівів...</p>}
+          {isArchivesError && <p>❌ Помилка при отриманні архівів</p>}
 
-            {archives.length > 0 ? (
-              <ul>
-                {archives.map((archive, index) => (
-                  <li key={index} className="archive-item">
-                    <button
-                      className="download-btn"
-                      onClick={() => downloadArchive(archive.name)}
-                    >
-                      📦 Завантажити {archive.name}.zip
-                    </button>
-                    <p className="archive-meta">
-                      🕒 {new Date(archive.createdAt).toLocaleString()}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              !isArchivesLoading && <p>Архівів ще немає</p>
-            )}
-          </section>
-        )}
+          {archives.length > 0 ? (
+            <ul>
+              {archives.map((archive, index) => (
+                <li key={index} className="archive-item">
+                  <button
+                    className="download-btn"
+                    onClick={() => handleDownload(archive.name)}
+                    disabled={isDownloading}
+                  >
+                    📦 Завантажити {archive.name}.zip
+                  </button>
+                  <p className="archive-meta">
+                    🕒 {new Date(archive.createdAt).toLocaleString()}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            !isArchivesLoading && <p>Архівів ще немає</p>
+          )}
+        </section>
       </main>
     </div>
   );
