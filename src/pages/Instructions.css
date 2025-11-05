@@ -1,0 +1,97 @@
+.instructions-page {
+  background: radial-gradient(circle at top left, #1a092b, #12041d);
+  color: #e6e6fa;
+  min-height: 100vh;
+  padding: 60px 20px 100px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.instructions-title {
+  text-align: center;
+  font-size: 32px;
+  color: #d2b6ff;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+
+.intro-text {
+  margin: 0 auto;
+  text-align: center;
+  color: #c5aaff;
+  font-size: 16px;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+/* Секції інструкцій */
+.instruction-section {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid #b18fff;
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.instruction-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 22px rgba(177, 143, 255, 0.25);
+}
+
+.instruction-section h3 {
+  color: #d2b6ff;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.instruction-section p,
+.instruction-section ul {
+  margin: 0 auto;
+  color: #f5f5ff;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.instruction-section ul {
+  text-align: left;
+  margin-left: 20px;
+}
+
+.instruction-section a {
+  color: #b18fff;
+  text-decoration: none;
+}
+
+.instruction-section a:hover {
+  text-decoration: underline;
+}
+
+/* Блок коду */
+.code-block {
+  background-color: #2a1045;
+  color: #d9caff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  margin-top: 10px;
+  border: 1px solid rgba(177, 143, 255, 0.2);
+  white-space: pre-wrap;
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+  .instructions-title {
+    font-size: 26px;
+  }
+
+  .instruction-section {
+    padding: 18px 20px;
+  }
+}

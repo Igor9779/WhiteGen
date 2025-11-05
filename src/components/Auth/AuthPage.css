@@ -1,0 +1,120 @@
+.auth-container {
+  background-color: #1a092b; /* темно-фіолетовий фон */
+  color: #e6e6fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.auth-form {
+  background-color: #2b0b45;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(177, 143, 255, 0.2);
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-form h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #b18fff;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3a0e5c;
+  color: #fff;
+  font-size: 14px;
+}
+
+input::placeholder {
+  color: #bbb;
+}
+
+.error {
+  color: #ff7a7a;
+  text-align: center;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn {
+  background-color: #4b0082;
+  color: white;
+}
+
+.login-btn:hover {
+  background-color: #6a0dad;
+}
+
+.register-btn {
+  background-color: #6200ee;
+  color: white;
+}
+
+.register-btn:hover {
+  background-color: #7b27f0;
+}
+
+.forgot-btn {
+  background-color: transparent;
+  color: #62d2ff;
+}
+
+.forgot-btn:hover {
+  color: #9be7ff;
+}
+
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 10px;
+  top: -4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 18px;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.toggle-password-btn:hover {
+  color: #62d2ff;
+}
