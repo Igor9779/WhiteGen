@@ -13,17 +13,25 @@ import {
 export default function ApiKeysPage() {
   const [clickupToken, setClickupTokenValue] = useState("");
   const [chatId, setChatId] = useState("");
+  const [caApiStatus, setcaApiStatus] = useState(false);
+  const [tgApiStatus, setTgApiStatus] = useState(false);
 
   // 🔹 Перевірки з бекенду
   const { data: tokenStatus, isLoading: isTokenLoading } = useQuery({
     queryKey: ["clickup-token"],
     queryFn: checkClickupToken,
+    onSuccess: () => {
+      setcaApiStatus(true);
+    },
     onError: () => toast.error("❌ Не вдалося перевірити ClickUp токен"),
   });
 
   const { data: telegramStatus, isLoading: isTelegramLoading } = useQuery({
     queryKey: ["telegram-id"],
     queryFn: checkTelegramChatId,
+    onSuccess: () => {
+      setTgApiStatus(true);
+    },
     onError: () => toast.error("❌ Не вдалося перевірити Telegram Chat ID"),
   });
 
@@ -85,7 +93,7 @@ export default function ApiKeysPage() {
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder={
-                  telegramStatus.exists
+                  telegramStatus.exists || tgApiStatus
                     ? "*********"
                     : "Введіть свій Telegram Chat ID"
                 }
@@ -110,11 +118,13 @@ export default function ApiKeysPage() {
           ) : telegramStatus ? (
             <p
               className={
-                telegramStatus.exists ? "text-success" : "text-warning"
+                telegramStatus.exists || tgApiStatus
+                  ? "text-success"
+                  : "text-warning"
               }
             >
               {telegramStatus.message ||
-                (telegramStatus.exists
+                (telegramStatus.exists || tgApiStatus
                   ? "✅ Telegram Chat ID збережено"
                   : "⚠️ Chat ID ще не задано")}
             </p>
@@ -135,7 +145,7 @@ export default function ApiKeysPage() {
                 value={clickupToken}
                 onChange={(e) => setClickupTokenValue(e.target.value)}
                 placeholder={
-                  tokenStatus.exists
+                  tokenStatus.exists || caApiStatus
                     ? "*********"
                     : "Введіть свій ClickUp токен"
                 }
@@ -158,9 +168,15 @@ export default function ApiKeysPage() {
           {isTokenLoading ? (
             <p>⏳ Перевірка токена...</p>
           ) : tokenStatus ? (
-            <p className={tokenStatus.exists ? "text-success" : "text-warning"}>
+            <p
+              className={
+                tokenStatus.exists || caApiStatus
+                  ? "text-success"
+                  : "text-warning"
+              }
+            >
               {tokenStatus.message ||
-                (tokenStatus.exists
+                (tokenStatus.exists || caApiStatus
                   ? "✅ ClickUp токен активний"
                   : "⚠️ Токен неактивний")}
             </p>
