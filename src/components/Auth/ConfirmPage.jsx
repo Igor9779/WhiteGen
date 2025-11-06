@@ -13,6 +13,13 @@ export default function ConfirmPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("userEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
+  }, []);
+
   // 🧩 Мутація для підтвердження 2FA-коду
   const confirmMutation = useMutation({
     mutationFn: confirmUser,
