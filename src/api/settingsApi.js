@@ -3,7 +3,7 @@ import { api } from "./axiosInstance";
 export const setClickupToken = async (clickupToken) => {
   const res = await api.post(
     "/settings/set-c-t",
-    { clickupToken },
+    { clickupToken: clickupToken },
     { withCredentials: true }
   );
   return res.data;
@@ -12,14 +12,18 @@ export const setClickupToken = async (clickupToken) => {
 export const setTelegramChatId = async (chatId) => {
   const res = await api.post(
     "/settings/set-t-id",
-    { chatId },
+    { chatId: chatId },
     { withCredentials: true }
   );
   return res.data;
 };
 
 export const checkClickupToken = async () => {
-  const res = await api.get("/settings/check-c-t", { withCredentials: true });
+  const res = await api.get(
+    "/settings/check-c-t",
+
+    { withCredentials: true }
+  );
   return res.data;
 };
 

@@ -29,7 +29,7 @@ export default function ApiKeysPage() {
 
   // 🔹 Мутації
   const clickupMutation = useMutation({
-    mutationFn: setClickupToken,
+    mutationFn: () => setClickupToken(clickupToken),
     onSuccess: () => toast.success("✅ ClickUp токен успішно збережено!"),
     onError: (err) =>
       toast.error(
@@ -39,7 +39,7 @@ export default function ApiKeysPage() {
   });
 
   const telegramMutation = useMutation({
-    mutationFn: setTelegramChatId,
+    mutationFn: () => setTelegramChatId(chatId),
     onSuccess: () => toast.success("✅ Telegram Chat ID успішно збережено!"),
     onError: (err) =>
       toast.error(
