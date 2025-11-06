@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
-import "./AuthPage.css"; // можеш використати ті самі стилі, що й для реєстрації
+import "./AuthPage.css";
 import { confirmUser } from "../../api/userApi";
 
 export default function ConfirmPage() {
