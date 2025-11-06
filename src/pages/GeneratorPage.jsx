@@ -9,6 +9,7 @@ import {
   getAllArchives,
 } from "../api/filesApi";
 import { checkClickupToken, checkTelegramChatId } from "../api/settingsApi";
+import { useNavigate } from "react-router-dom";
 
 export default function GeneratorPage() {
   const [status, setStatus] = useState("⏳ Очікування запуску...");
