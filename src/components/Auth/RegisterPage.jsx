@@ -22,7 +22,7 @@ export default function RegisterPage() {
     onSuccess: (data) => {
       toast.success("✅ Реєстрація успішна! Код відправлено адміністратору.");
       console.log("Registered user:", data);
-      navigate("/confirm");
+      navigate("/confirm", { state: { email } });
     },
 
     onError: (err) => {

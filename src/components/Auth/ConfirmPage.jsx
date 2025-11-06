@@ -1,24 +1,20 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import "./AuthPage.css";
 import { confirmUser } from "../../api/userApi";
 
 export default function ConfirmPage() {
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const initialEmail = location.state?.email || "";
+
+  const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const savedEmail = localStorage.getItem("userEmail");
-    if (savedEmail) {
-      setEmail(savedEmail);
-    }
-  }, []);
 
   // 🧩 Мутація для підтвердження 2FA-коду
   const confirmMutation = useMutation({
