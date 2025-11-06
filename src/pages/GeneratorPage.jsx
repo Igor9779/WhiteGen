@@ -8,6 +8,7 @@ import {
   generateLanding,
   getAllArchives,
 } from "../api/filesApi";
+import { checkClickupToken, checkTelegramChatId } from "../api/settingsApi";
 
 export default function GeneratorPage() {
   const [status, setStatus] = useState("⏳ Очікування запуску...");
@@ -24,6 +25,8 @@ export default function GeneratorPage() {
     "brand_name": "AIpowerGen"
   }
 ]`);
+  const [showMissingTokensModal, setShowMissingTokensModal] = useState(false);
+  const navigate = useNavigate();
 
   // 🔹 Завантаження архівів при відкритті сторінки
   const {
@@ -53,10 +56,31 @@ export default function GeneratorPage() {
     },
   });
 
+  // 🔹 Перевірка токенів при завантаженні сторінки
+  const { data: clickupStatus } = useQuery({
+    queryKey: ["clickup-token"],
+    queryFn: checkClickupToken,
+  });
+
+  const { data: telegramStatus } = useQuery({
+    queryKey: ["telegram-id"],
+    queryFn: checkTelegramChatId,
+  });
+
   // 🔸 Обробка форми
   const handleGenerate = async (e) => {
     e.preventDefault();
     setStatus("⏳ Генерація запущена...");
+
+    // 🔍 Перевірка токенів
+    const isClickupMissing = !clickupStatus?.active && !clickupStatus?.exists;
+    const isTelegramMissing = !telegramStatus?.exists;
+
+    if (isClickupMissing || isTelegramMissing) {
+      setShowMissingTokensModal(true);
+      setStatus("⚠️ Необхідно додати токени перед генерацією");
+      return;
+    }
 
     const form = e.target;
     let parsed;
@@ -238,6 +262,31 @@ export default function GeneratorPage() {
           )}
         </section>
       </main>
+      {showMissingTokensModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>⚠️ Відсутні токени</h3>
+            <p>
+              Для запуску генерації потрібно вказати ClickUp токен і Telegram
+              Chat ID.
+            </p>
+            <div className="modal-buttons">
+              <button
+                className="btn"
+                onClick={() => setShowMissingTokensModal(false)}
+              >
+                Закрити
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => navigate("/instructions")}
+              >
+                Перейти до інструкції
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
