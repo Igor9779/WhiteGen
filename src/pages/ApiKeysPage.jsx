@@ -13,32 +13,38 @@ import {
 export default function ApiKeysPage() {
   const [clickupToken, setClickupTokenValue] = useState("");
   const [chatId, setChatId] = useState("");
-  const [caApiStatus, setcaApiStatus] = useState(false);
-  const [tgApiStatus, setTgApiStatus] = useState(false);
+  const [showClickup, setShowClickup] = useState(false);
+  const [showTelegram, setShowTelegram] = useState(false);
+  const [tokenExists, setTokenExists] = useState(false);
+  const [chatExists, setChatExists] = useState(false);
 
-  // 🔹 Перевірки з бекенду
-  const { data: tokenStatus, isLoading: isTokenLoading } = useQuery({
+  // 🔹 Перевірка стану з бекенду (при першому завантаженні)
+  const { isLoading: isTokenLoading } = useQuery({
     queryKey: ["clickup-token"],
     queryFn: checkClickupToken,
-    onSuccess: () => {
-      setcaApiStatus(true);
+    onSuccess: (data) => {
+      setTokenExists(data?.exists || false);
     },
     onError: () => toast.error("❌ Не вдалося перевірити ClickUp токен"),
   });
 
-  const { data: telegramStatus, isLoading: isTelegramLoading } = useQuery({
+  const { isLoading: isTelegramLoading } = useQuery({
     queryKey: ["telegram-id"],
     queryFn: checkTelegramChatId,
-    onSuccess: () => {
-      setTgApiStatus(true);
+    onSuccess: (data) => {
+      setChatExists(data?.exists || false);
     },
     onError: () => toast.error("❌ Не вдалося перевірити Telegram Chat ID"),
   });
 
-  // 🔹 Мутації
+  // 🔹 Мутації — без refetch, просто оновлюємо локальний стан
   const clickupMutation = useMutation({
-    mutationFn: () => setClickupToken(clickupToken),
-    onSuccess: () => toast.success("✅ ClickUp токен успішно збережено!"),
+    mutationFn: (token) => setClickupToken(token),
+    onSuccess: () => {
+      toast.success("✅ ClickUp токен успішно збережено!");
+      setTokenExists(true); // оновлюємо локально
+      setClickupTokenValue(""); // очищаємо поле
+    },
     onError: (err) =>
       toast.error(
         err.response?.data?.message ||
@@ -47,8 +53,12 @@ export default function ApiKeysPage() {
   });
 
   const telegramMutation = useMutation({
-    mutationFn: () => setTelegramChatId(chatId),
-    onSuccess: () => toast.success("✅ Telegram Chat ID успішно збережено!"),
+    mutationFn: (id) => setTelegramChatId(id),
+    onSuccess: () => {
+      toast.success("✅ Telegram Chat ID успішно збережено!");
+      setChatExists(true); // оновлюємо локально
+      setChatId(""); // очищаємо поле
+    },
     onError: (err) =>
       toast.error(
         err.response?.data?.message ||
@@ -56,6 +66,7 @@ export default function ApiKeysPage() {
       ),
   });
 
+  // 🔸 Обробники
   const handleClickupSubmit = (e) => {
     e.preventDefault();
     if (!clickupToken.trim()) {
@@ -89,16 +100,21 @@ export default function ApiKeysPage() {
             <div className="password-field">
               <input
                 id="chatId"
-                type="text"
+                type={showTelegram ? "text" : "password"}
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder={
-                  telegramStatus?.exists || tgApiStatus
-                    ? "*********"
-                    : "Введіть свій Telegram Chat ID"
+                  chatExists ? "*********" : "Введіть свій Telegram Chat ID"
                 }
                 required
               />
+              <button
+                type="button"
+                className="toggle-visibility"
+                onClick={() => setShowTelegram((prev) => !prev)}
+              >
+                {showTelegram ? "🙈" : "👁️"}
+              </button>
             </div>
           </div>
 
@@ -112,24 +128,14 @@ export default function ApiKeysPage() {
               : "Відправити Chat ID"}
           </button>
 
-          {/* 🔸 Статус Telegram */}
           {isTelegramLoading ? (
             <p>⏳ Перевірка Chat ID...</p>
-          ) : telegramStatus ? (
-            <p
-              className={
-                telegramStatus?.exists || tgApiStatus
-                  ? "text-success"
-                  : "text-warning"
-              }
-            >
-              {telegramStatus.message ||
-                (telegramStatus?.exists || tgApiStatus
-                  ? "✅ Telegram Chat ID збережено"
-                  : "⚠️ Chat ID ще не задано")}
-            </p>
           ) : (
-            <p>❌ Даних про Chat ID немає</p>
+            <p className={chatExists ? "text-success" : "text-warning"}>
+              {chatExists
+                ? "✅ Telegram Chat ID збережено"
+                : "⚠️ Chat ID ще не задано"}
+            </p>
           )}
         </form>
 
@@ -141,16 +147,21 @@ export default function ApiKeysPage() {
             <div className="password-field">
               <input
                 id="clickupToken"
-                type="text"
+                type={showClickup ? "text" : "password"}
                 value={clickupToken}
                 onChange={(e) => setClickupTokenValue(e.target.value)}
                 placeholder={
-                  tokenStatus?.exists || caApiStatus
-                    ? "*********"
-                    : "Введіть свій ClickUp токен"
+                  tokenExists ? "*********" : "Введіть свій ClickUp токен"
                 }
                 required
               />
+              <button
+                type="button"
+                className="toggle-visibility"
+                onClick={() => setShowClickup((prev) => !prev)}
+              >
+                {showClickup ? "🙈" : "👁️"}
+              </button>
             </div>
           </div>
 
@@ -164,24 +175,14 @@ export default function ApiKeysPage() {
               : "Відправити ClickUp токен"}
           </button>
 
-          {/* 🔸 Статус ClickUp токена */}
           {isTokenLoading ? (
             <p>⏳ Перевірка токена...</p>
-          ) : tokenStatus ? (
-            <p
-              className={
-                tokenStatus?.exists || caApiStatus
-                  ? "text-success"
-                  : "text-warning"
-              }
-            >
-              {tokenStatus.message ||
-                (tokenStatus || caApiStatus
-                  ? "✅ ClickUp токен активний"
-                  : "⚠️ Токен неактивний")}
-            </p>
           ) : (
-            <p>❌ Даних про токен немає</p>
+            <p className={tokenExists ? "text-success" : "text-warning"}>
+              {tokenExists
+                ? "✅ ClickUp токен активний"
+                : "⚠️ Токен ще не заданий"}
+            </p>
           )}
         </form>
       </section>
