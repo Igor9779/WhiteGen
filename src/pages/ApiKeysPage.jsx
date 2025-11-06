@@ -81,7 +81,7 @@ export default function ApiKeysPage() {
             <div className="password-field">
               <input
                 id="chatId"
-                type={showTelegram ? "text" : "password"}
+                type="text"
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder="Введіть свій Chat ID"
@@ -127,7 +127,7 @@ export default function ApiKeysPage() {
             <div className="password-field">
               <input
                 id="clickupToken"
-                type={showClickup ? "text" : "password"}
+                type="text"
                 value={clickupToken}
                 onChange={(e) => setClickupTokenValue(e.target.value)}
                 placeholder="Вставте свій токен"
