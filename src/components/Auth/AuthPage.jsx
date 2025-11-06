@@ -48,6 +48,8 @@ export default function AuthPage() {
           <label>Email</label>
           <input
             type="email"
+            name="email"
+            autoComplete="email"
             placeholder="example@9d.pro"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
