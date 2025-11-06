@@ -93,7 +93,7 @@ export default function ApiKeysPage() {
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder={
-                  telegramStatus.exists || tgApiStatus
+                  telegramStatus?.exists || tgApiStatus
                     ? "*********"
                     : "Введіть свій Telegram Chat ID"
                 }
@@ -118,13 +118,13 @@ export default function ApiKeysPage() {
           ) : telegramStatus ? (
             <p
               className={
-                telegramStatus.exists || tgApiStatus
+                telegramStatus?.exists || tgApiStatus
                   ? "text-success"
                   : "text-warning"
               }
             >
               {telegramStatus.message ||
-                (telegramStatus.exists || tgApiStatus
+                (telegramStatus?.exists || tgApiStatus
                   ? "✅ Telegram Chat ID збережено"
                   : "⚠️ Chat ID ще не задано")}
             </p>
@@ -145,7 +145,7 @@ export default function ApiKeysPage() {
                 value={clickupToken}
                 onChange={(e) => setClickupTokenValue(e.target.value)}
                 placeholder={
-                  tokenStatus.exists || caApiStatus
+                  tokenStatus?.exists || caApiStatus
                     ? "*********"
                     : "Введіть свій ClickUp токен"
                 }
@@ -170,13 +170,13 @@ export default function ApiKeysPage() {
           ) : tokenStatus ? (
             <p
               className={
-                tokenStatus.exists || caApiStatus
+                tokenStatus?.exists || caApiStatus
                   ? "text-success"
                   : "text-warning"
               }
             >
               {tokenStatus.message ||
-                (tokenStatus.exists || caApiStatus
+                (tokenStatus || caApiStatus
                   ? "✅ ClickUp токен активний"
                   : "⚠️ Токен неактивний")}
             </p>
