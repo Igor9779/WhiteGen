@@ -22,6 +22,9 @@ export const generateLanding = async (payload) => {
 };
 
 export const getAllArchives = async () => {
-  const res = await api.get("/api/generation");
+  const res = await api.get("/api/generation", {
+    withCredentials: true, // 🔹 обов’язково для авторизації
+  });
+  console.log("📦 Отримані архіви:", res.data);
   return res.data;
 };

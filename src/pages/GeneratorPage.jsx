@@ -11,7 +11,6 @@ import {
 
 export default function GeneratorPage() {
   const [status, setStatus] = useState("⏳ Очікування запуску...");
-  const [archives, setArchives] = useState([]);
   const [isDownloading, setIsDownloading] = useState(false);
   const [themesText, setThemesText] = useState(`[
   {
@@ -27,25 +26,25 @@ export default function GeneratorPage() {
 ]`);
 
   // 🔹 Завантаження архівів при відкритті сторінки
-  const { isLoading: isArchivesLoading, isError: isArchivesError } = useQuery({
+  const {
+    data: archives = [],
+    isLoading: isArchivesLoading,
+    isError: isArchivesError,
+    refetch: refetchArchives,
+  } = useQuery({
     queryKey: ["archives"],
     queryFn: getAllArchives,
-    onSuccess: (data) => setArchives(data),
     onError: () => toast.error("❌ Не вдалося отримати архіви користувача"),
   });
 
   // 🔹 Мутація для запуску генерації лендингів
   const mutation = useMutation({
     mutationFn: generateLanding,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("✅ Генерація успішно запущена!");
+      setStatus("✅ Генерація завершена, оновлюємо список архівів...");
+      await refetchArchives(); // 🔁 після генерації оновлюємо список архівів
       setStatus("✅ Генерація завершена, можна завантажити архів");
-      if (data.whiteId) {
-        setArchives((prev) => [
-          ...prev,
-          { name: `${data.whiteId}.zip`, createdAt: new Date().toISOString() },
-        ]);
-      }
     },
     onError: (err) => {
       const msg = err.response?.data?.message || "🚨 Помилка при генерації";
