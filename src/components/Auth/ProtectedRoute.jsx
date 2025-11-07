@@ -22,7 +22,7 @@ export default function ProtectedRoute({ children }) {
   }
 
   // 🚫 Якщо помилка — редірект на /
-  if (isError || !data?.authenticated) {
+  if (isError || !data?.success) {
     return <Navigate to="/" replace />;
   }
 

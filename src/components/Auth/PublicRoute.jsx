@@ -19,7 +19,7 @@ export default function PublicRoute({ children }) {
   }
 
   // ✅ якщо користувач уже авторизований → редіректимо в генератор
-  if (!isError && data?.authenticated) {
+  if (!isError && data?.success) {
     return <Navigate to="/generator" replace />;
   }
 
