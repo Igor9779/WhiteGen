@@ -14,6 +14,8 @@ export default function AuthPage() {
   const [forgotEmail, setForgotEmail] = useState("");
   const navigate = useNavigate();
 
+  navigate("/reset-password", { state: { allowReset: true } });
+
   // 🔹 Мутація логіну
   const loginMutation = useMutation({
     mutationFn: loginUser,

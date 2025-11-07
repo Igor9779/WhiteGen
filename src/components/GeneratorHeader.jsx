@@ -19,8 +19,14 @@ export default function GeneratorHeader() {
   const logoutMutation = useMutation({
     mutationFn: logoutUser,
     onSuccess: () => {
+      // 🔹 очищуємо токен і сесію
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+
       toast.info("🚪 Ви вийшли із системи");
-      navigate("/");
+
+      // 🔹 використовуємо replace(), щоб не можна було повернутись назад
+      navigate("/", { replace: true });
     },
     onError: (err) => {
       toast.error("❌ Помилка виходу: " + (err.message || "невідома"));
@@ -28,7 +34,7 @@ export default function GeneratorHeader() {
   });
 
   const handleLogout = () => {
-    logoutMutation.mutate(); // запускаємо запит
+    logoutMutation.mutate();
   };
 
   const handleSidebarToggle = () => {
@@ -69,14 +75,27 @@ export default function GeneratorHeader() {
         <nav className="sidebar-nav">
           <button
             style={{ marginTop: "52px" }}
-            onClick={() => navigate("/generator")}
+            onClick={() => {
+              setIsSidebarOpen(false);
+              navigate("/generator");
+            }}
           >
             <BsHouseDoor /> Генератор
           </button>
-          <button onClick={() => navigate("/instructions")}>
+          <button
+            onClick={() => {
+              setIsSidebarOpen(false);
+              navigate("/instructions");
+            }}
+          >
             <BsFileEarmarkText /> Інструкція
           </button>
-          <button onClick={() => navigate("/apikeys")}>
+          <button
+            onClick={() => {
+              setIsSidebarOpen(false);
+              navigate("/apikeys");
+            }}
+          >
             <BsGear /> API Ключі
           </button>
         </nav>

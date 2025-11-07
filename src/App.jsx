@@ -14,16 +14,42 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmPage from "./components/Auth/ConfirmPage";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import PublicRoute from "./components/Auth/PublicRoute";
 import ResetPasswordPage from "./components/Auth/ResetPasswordPage";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<AuthPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/confirm" element={<ConfirmPage />} />
+        {/* 🔹 Публічні сторінки (тільки якщо користувач не авторизований) */}
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <AuthPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/confirm"
+          element={
+            <PublicRoute>
+              <ConfirmPage />
+            </PublicRoute>
+          }
+        />
+
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* 🔹 Захищені сторінки — тільки для залогінених */}
         <Route
           path="/generator"
           element={
@@ -48,8 +74,11 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* 🔹 Будь-який інший шлях — редірект */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+
       <ToastContainer
         position="top-right"
         autoClose={3000}
