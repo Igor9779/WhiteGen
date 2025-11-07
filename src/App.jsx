@@ -21,7 +21,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* 🔹 Публічні сторінки (тільки якщо користувач не авторизований) */}
+        {/* 🔹 Публічні сторінки (доступні тільки неавторизованим) */}
         <Route
           path="/"
           element={
@@ -46,8 +46,14 @@ function App() {
             </PublicRoute>
           }
         />
-
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPasswordPage />
+            </PublicRoute>
+          }
+        />
 
         {/* 🔹 Захищені сторінки — тільки для залогінених */}
         <Route
@@ -76,9 +82,10 @@ function App() {
         />
 
         {/* 🔹 Будь-який інший шлях — редірект */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
+      {/* 🔔 Toast Container */}
       <ToastContainer
         position="top-right"
         autoClose={3000}

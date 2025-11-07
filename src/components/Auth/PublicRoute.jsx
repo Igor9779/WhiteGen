@@ -1,11 +1,28 @@
+import { useQuery } from "@tanstack/react-query";
+import { checkAuth } from "../../api/userApi";
 import { Navigate } from "react-router-dom";
 
 /**
- * PublicRoute — захищає публічні сторінки (login, register, confirm)
- * від доступу вже авторизованих користувачів.
+ * PublicRoute — блокує доступ до сторінок (login, register, confirm, reset-password)
+ * для користувачів, які вже авторизовані (мають активну сесію на бекенді).
  */
 export default function PublicRoute({ children }) {
-  const isAuthenticated = !!localStorage.getItem("token"); // або sessionStorage
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["auth-check"],
+    queryFn: checkAuth,
+    retry: false,
+    staleTime: 0,
+  });
 
-  return isAuthenticated ? <Navigate to="/generator" replace /> : children;
+  if (isLoading) {
+    return <p className="text-center mt-10">⏳ Перевірка доступу...</p>;
+  }
+
+  // ✅ якщо користувач уже авторизований → редіректимо в генератор
+  if (!isError && data?.authenticated) {
+    return <Navigate to="/generator" replace />;
+  }
+
+  // 🔓 інакше показуємо сторінку (login, register тощо)
+  return children;
 }
