@@ -20,12 +20,26 @@ export default function ConfirmPage() {
   const confirmMutation = useMutation({
     mutationFn: confirmUser,
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("✅ Код підтверджено! Акаунт активовано.");
       console.log("Confirmed user:", data);
-      setTimeout(() => {
-        navigate("/generator", { replace: true });
-      }, 500);
+
+      // 🕓 Чекаємо, поки бекенд виставить cookie
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      try {
+        const authCheck = await checkAuth();
+        if (authCheck?.authenticated) {
+          navigate("/generator", { replace: true });
+        } else {
+          toast.warn("⚠️ Сесія ще не оновилась. Увійдіть знову.");
+          navigate("/", { replace: true });
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        toast.error("❌ Помилка перевірки сесії");
+        navigate("/", { replace: true });
+      }
     },
 
     onError: (err) => {
