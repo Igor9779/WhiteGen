@@ -13,43 +13,36 @@ import {
 export default function ApiKeysPage() {
   const [clickupToken, setClickupTokenValue] = useState("");
   const [chatId, setChatId] = useState("");
-  const [tokenExists, setTokenExists] = useState(false);
-  const [chatExists, setChatExists] = useState(false);
 
-  // 🔹 Перевірка стану з бекенду (при першому завантаженні)
-  const { isLoading: isTokenLoading } = useQuery({
+  // 🔹 Отримуємо статуси напряму з бекенду
+  const {
+    data: clickupData,
+    isLoading: isTokenLoading,
+    isError: isTokenError,
+  } = useQuery({
     queryKey: ["clickup-token"],
     queryFn: checkClickupToken,
-    onSuccess: (data) => {
-      console.log("✅ ClickUp check:", data);
-      setTokenExists(Boolean(data?.exists));
-    },
-    onError: (err) => {
-      console.error("❌ ClickUp check error:", err);
-      toast.error("Не вдалося перевірити ClickUp токен");
-    },
+    refetchOnMount: true,
+    staleTime: 0,
   });
 
-  const { isLoading: isTelegramLoading } = useQuery({
+  const {
+    data: telegramData,
+    isLoading: isTelegramLoading,
+    isError: isTelegramError,
+  } = useQuery({
     queryKey: ["telegram-id"],
     queryFn: checkTelegramChatId,
-    onSuccess: (data) => {
-      console.log("✅ Telegram check:", data);
-      setChatExists(Boolean(data?.exists));
-    },
-    onError: (err) => {
-      console.error("❌ Telegram check error:", err);
-      toast.error("Не вдалося перевірити Telegram Chat ID");
-    },
+    refetchOnMount: true,
+    staleTime: 0,
   });
 
-  // 🔹 Мутації — без refetch, просто оновлюємо локальний стан
+  // 🔹 Мутації
   const clickupMutation = useMutation({
     mutationFn: (token) => setClickupToken(token),
     onSuccess: () => {
       toast.success("✅ ClickUp токен успішно збережено!");
-      setTokenExists(true); // оновлюємо локально
-      setClickupTokenValue(""); // очищаємо поле
+      setClickupTokenValue("");
     },
     onError: (err) =>
       toast.error(
@@ -62,8 +55,7 @@ export default function ApiKeysPage() {
     mutationFn: (id) => setTelegramChatId(id),
     onSuccess: () => {
       toast.success("✅ Telegram Chat ID успішно збережено!");
-      setChatExists(true); // оновлюємо локально
-      setChatId(""); // очищаємо поле
+      setChatId("");
     },
     onError: (err) =>
       toast.error(
@@ -91,6 +83,7 @@ export default function ApiKeysPage() {
     telegramMutation.mutate(chatId);
   };
 
+  // 🔸 Відображення
   return (
     <div className="api-page-wrapper">
       <GeneratorHeader />
@@ -110,7 +103,9 @@ export default function ApiKeysPage() {
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder={
-                  chatExists ? "*********" : "Введіть свій Telegram Chat ID"
+                  telegramData?.exists
+                    ? "*********"
+                    : "Введіть свій Telegram Chat ID"
                 }
                 required
               />
@@ -129,12 +124,12 @@ export default function ApiKeysPage() {
 
           {isTelegramLoading ? (
             <p>⏳ Перевірка Chat ID...</p>
+          ) : isTelegramError ? (
+            <p className="text-danger">❌ Помилка перевірки Chat ID</p>
+          ) : telegramData?.exists ? (
+            <p className="text-success">✅ Telegram Chat ID збережено</p>
           ) : (
-            <p className={chatExists ? "text-success" : "text-warning"}>
-              {chatExists
-                ? "✅ Telegram Chat ID збережено"
-                : "⚠️ Chat ID ще не задано"}
-            </p>
+            <p className="text-warning">⚠️ Chat ID ще не задано</p>
           )}
         </form>
 
@@ -150,7 +145,9 @@ export default function ApiKeysPage() {
                 value={clickupToken}
                 onChange={(e) => setClickupTokenValue(e.target.value)}
                 placeholder={
-                  tokenExists ? "*********" : "Введіть свій ClickUp токен"
+                  clickupData?.exists
+                    ? "*********"
+                    : "Введіть свій ClickUp токен"
                 }
                 required
               />
@@ -169,12 +166,12 @@ export default function ApiKeysPage() {
 
           {isTokenLoading ? (
             <p>⏳ Перевірка токена...</p>
+          ) : isTokenError ? (
+            <p className="text-danger">❌ Помилка перевірки токена</p>
+          ) : clickupData?.exists ? (
+            <p className="text-success">✅ ClickUp токен активний</p>
           ) : (
-            <p className={tokenExists ? "text-success" : "text-warning"}>
-              {tokenExists
-                ? "✅ ClickUp токен активний"
-                : "⚠️ Токен ще не заданий"}
-            </p>
+            <p className="text-warning">⚠️ Токен ще не заданий</p>
           )}
         </form>
       </section>
