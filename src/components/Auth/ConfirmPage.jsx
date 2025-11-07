@@ -4,12 +4,13 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AuthPage.css";
-import { confirmUser } from "../../api/userApi";
+import { confirmUser, checkAuth } from "../../api/userApi";
 
 export default function ConfirmPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 🔹 якщо сторінку відкрили без email — одразу редірект
   useEffect(() => {
     if (!location.state?.email) {
       navigate("/", { replace: true });
@@ -17,7 +18,6 @@ export default function ConfirmPage() {
   }, [location.state, navigate]);
 
   const initialEmail = location.state?.email || "";
-
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -26,12 +26,25 @@ export default function ConfirmPage() {
   const confirmMutation = useMutation({
     mutationFn: confirmUser,
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("✅ Код підтверджено! Акаунт активовано.");
       console.log("Confirmed user:", data);
-      setTimeout(() => {
-        navigate("/generator", { replace: true });
-      }, 500);
+
+      // 🕓 невелика пауза — Render іноді виставляє cookie із затримкою
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      try {
+        const auth = await checkAuth();
+        if (auth?.authenticated) {
+          navigate("/generator", { replace: true });
+        } else {
+          toast.warn("⚠️ Сесія ще не оновилась. Будь ласка, увійдіть знову.");
+          navigate("/", { replace: true });
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        navigate("/", { replace: true });
+      }
     },
 
     onError: (err) => {
