@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AuthPage.css";
-import { confirmUser } from "../../api/userApi";
+import { confirmUser, checkAuth } from "../../api/userApi"; // ✅ додано checkAuth
 
 export default function ConfirmPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const initialEmail = location.state?.email || "";
+  useEffect(() => {
+    if (!location.state?.email) {
+      navigate("/", { replace: true });
+    }
+  }, [location.state, navigate]);
 
+  const initialEmail = location.state?.email || "";
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -19,12 +24,11 @@ export default function ConfirmPage() {
   // 🧩 Мутація для підтвердження 2FA-коду
   const confirmMutation = useMutation({
     mutationFn: confirmUser,
-
     onSuccess: async (data) => {
       toast.success("✅ Код підтверджено! Акаунт активовано.");
       console.log("Confirmed user:", data);
 
-      // 🕓 Чекаємо, поки бекенд виставить cookie
+      // 🕓 невелика затримка, щоб бекенд встиг оновити cookie
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       try {
@@ -41,7 +45,6 @@ export default function ConfirmPage() {
         navigate("/", { replace: true });
       }
     },
-
     onError: (err) => {
       const msg =
         err.response?.data?.message ||
@@ -67,8 +70,6 @@ export default function ConfirmPage() {
           <label>Email</label>
           <input
             type="email"
-            name="email"
-            autoComplete="email"
             placeholder="example@9d.pro"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -89,12 +90,7 @@ export default function ConfirmPage() {
         </div>
 
         {error && <p className="error">{error}</p>}
-        {confirmMutation.isPending && (
-          <p className="loading">⏳ Підтвердження...</p>
-        )}
-        {confirmMutation.isSuccess && (
-          <p className="success">✅ Код успішно підтверджено</p>
-        )}
+        {confirmMutation.isPending && <p>⏳ Підтвердження...</p>}
 
         <div className="button-group">
           <button
