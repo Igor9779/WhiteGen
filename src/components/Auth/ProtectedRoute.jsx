@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 export default function ProtectedRoute({ children }) {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["auth-check"],
+    queryKey: ["auth-check-protected"],
     queryFn: checkAuth,
     retry: false,
     staleTime: 0,

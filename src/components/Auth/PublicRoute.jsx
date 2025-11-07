@@ -8,7 +8,7 @@ import { Navigate } from "react-router-dom";
  */
 export default function PublicRoute({ children }) {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["auth-check"],
+    queryKey: ["auth-check-public"],
     queryFn: checkAuth,
     retry: false,
     staleTime: 0,
