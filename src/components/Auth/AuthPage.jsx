@@ -20,7 +20,7 @@ export default function AuthPage() {
     onSuccess: (data) => {
       toast.success("✅ Логін успішний! Код 2FA відправлено адміністратору.");
       console.log("Login response:", data);
-      navigate("/confirm", { state: { email } });
+      navigate("/confirm", { state: { email }, replace: true });
     },
     onError: (err) => {
       const msg =
