@@ -24,9 +24,10 @@ export default function ApiKeysPage() {
       console.log("✅ ClickUp check:", data);
       setTokenExists(Boolean(data?.exists));
     },
-    refetchOnMount: true,
-    staleTime: 0,
-    onError: () => toast.error("❌ Не вдалося перевірити ClickUp токен"),
+    onError: (err) => {
+      console.error("❌ ClickUp check error:", err);
+      toast.error("Не вдалося перевірити ClickUp токен");
+    },
   });
 
   const { isLoading: isTelegramLoading } = useQuery({
@@ -36,9 +37,10 @@ export default function ApiKeysPage() {
       console.log("✅ Telegram check:", data);
       setChatExists(Boolean(data?.exists));
     },
-    refetchOnMount: true,
-    staleTime: 0,
-    onError: () => toast.error("❌ Не вдалося перевірити Telegram Chat ID"),
+    onError: (err) => {
+      console.error("❌ Telegram check error:", err);
+      toast.error("Не вдалося перевірити Telegram Chat ID");
+    },
   });
 
   // 🔹 Мутації — без refetch, просто оновлюємо локальний стан
