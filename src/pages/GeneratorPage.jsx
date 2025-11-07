@@ -27,6 +27,7 @@ export default function GeneratorPage() {
   }
 ]`);
   const [showMissingTokensModal, setShowMissingTokensModal] = useState(false);
+  const [missingReason, setMissingReason] = useState(""); // 🔹 динамічний текст
   const navigate = useNavigate();
 
   // 🔹 Завантаження архівів при відкритті сторінки
@@ -44,10 +45,10 @@ export default function GeneratorPage() {
   // 🔹 Мутація для запуску генерації лендингів
   const mutation = useMutation({
     mutationFn: generateLanding,
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       toast.success("✅ Генерація успішно запущена!");
       setStatus("✅ Генерація завершена, оновлюємо список архівів...");
-      await refetchArchives(); // 🔁 після генерації оновлюємо список архівів
+      await refetchArchives();
       setStatus("✅ Генерація завершена, можна завантажити архів");
     },
     onError: (err) => {
@@ -71,21 +72,40 @@ export default function GeneratorPage() {
   // 🔸 Обробка форми
   const handleGenerate = async (e) => {
     e.preventDefault();
-    setStatus("⏳ Генерація запущена...");
+    setStatus("⏳ Перевірка токенів перед генерацією...");
 
-    // 🔍 Перевірка токенів
-    const isClickupMissing = !clickupStatus?.active && !clickupStatus?.exists;
-    const isTelegramMissing = !telegramStatus?.exists;
+    const form = e.target;
+    const isClickupChecked =
+      form.clickupfile.checked || form.sentclickupfile.checked;
 
-    if (isClickupMissing || isTelegramMissing) {
+    const hasTelegram = telegramStatus?.exists === true;
+    const hasClickup =
+      clickupStatus?.exists === true && clickupStatus?.active !== false;
+
+    // 🧩 Telegram Chat ID — обов’язковий завжди
+    if (!hasTelegram) {
+      setMissingReason(
+        "Відсутній Telegram Chat ID. Його потрібно додати, щоб отримувати статуси генерації."
+      );
       setShowMissingTokensModal(true);
-      setStatus("⚠️ Необхідно додати токени перед генерацією");
+      setStatus("⚠️ Необхідно додати Telegram Chat ID перед генерацією");
       return;
     }
 
-    const form = e.target;
-    let parsed;
+    // 🧩 Якщо увімкнено ClickUp, але токен відсутній
+    if (isClickupChecked && !hasClickup) {
+      setMissingReason(
+        "Ви вибрали опції ClickUp, але токен ClickUp відсутній. Будь ласка, додайте його перед запуском генерації."
+      );
+      setShowMissingTokensModal(true);
+      setStatus("⚠️ Необхідно додати ClickUp токен перед генерацією");
+      return;
+    }
 
+    // ✅ Якщо все гаразд
+    setStatus("⏳ Генерація запущена...");
+
+    let parsed;
     try {
       parsed = JSON.parse(themesText);
     } catch {
@@ -128,7 +148,7 @@ export default function GeneratorPage() {
     mutation.mutate(payload);
   };
 
-  // 🔹 Завантаження архіву з блокуванням кнопки
+  // 🔹 Завантаження архіву
   const handleDownload = async (whiteId) => {
     setIsDownloading(true);
     try {
@@ -263,14 +283,13 @@ export default function GeneratorPage() {
           )}
         </section>
       </main>
+
+      {/* 🔸 Модалка при відсутності токенів */}
       {showMissingTokensModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>⚠️ Відсутні токени</h3>
-            <p>
-              Для запуску генерації потрібно вказати ClickUp токен і Telegram
-              Chat ID.
-            </p>
+            <h3>⚠️ Відсутні необхідні токени</h3>
+            <p>{missingReason}</p>
             <div className="modal-buttons">
               <button
                 className="btn"
@@ -280,9 +299,9 @@ export default function GeneratorPage() {
               </button>
               <button
                 className="btn btn-primary"
-                onClick={() => navigate("/instructions")}
+                onClick={() => navigate("/apikeys")}
               >
-                Перейти до інструкції
+                Відкрити налаштування API
               </button>
             </div>
           </div>
