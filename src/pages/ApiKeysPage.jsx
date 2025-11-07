@@ -112,9 +112,7 @@ export default function ApiKeysPage() {
                 type="button"
                 className="toggle-visibility"
                 onClick={() => setShowTelegram((prev) => !prev)}
-              >
-                {showTelegram ? "🙈" : "👁️"}
-              </button>
+              ></button>
             </div>
           </div>
 
@@ -159,9 +157,7 @@ export default function ApiKeysPage() {
                 type="button"
                 className="toggle-visibility"
                 onClick={() => setShowClickup((prev) => !prev)}
-              >
-                {showClickup ? "🙈" : "👁️"}
-              </button>
+              ></button>
             </div>
           </div>
 
