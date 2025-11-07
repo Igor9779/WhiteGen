@@ -29,7 +29,9 @@ export default function ConfirmPage() {
     onSuccess: (data) => {
       toast.success("✅ Код підтверджено! Акаунт активовано.");
       console.log("Confirmed user:", data);
-      navigate("/generator", { replace: true });
+      setTimeout(() => {
+        navigate("/generator", { replace: true });
+      }, 500);
     },
 
     onError: (err) => {
