@@ -28,3 +28,12 @@ export const checkAuth = async () => {
   const res = await api.post("/auth/check-auth");
   return res.data;
 };
+
+// Скидання / оновлення пароля
+export const resetPassword = async ({ password, confirmPassword }) => {
+  const res = await api.post("/auth/reset-password", {
+    password,
+    confirmPassword,
+  });
+  return res.data;
+};

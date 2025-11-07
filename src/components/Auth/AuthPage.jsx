@@ -10,6 +10,8 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotForm, setShowForgotForm] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
   const navigate = useNavigate();
 
   // 🔹 Мутація логіну
@@ -18,12 +20,31 @@ export default function AuthPage() {
     onSuccess: (data) => {
       toast.success("✅ Логін успішний! Код 2FA відправлено адміністратору.");
       console.log("Login response:", data);
-      navigate("/confirm", { state: { email } }); // користувач переходить на сторінку для введення коду
+      navigate("/confirm", { state: { email } });
     },
     onError: (err) => {
       const msg =
         err.response?.data?.message || err.message || "❌ Помилка входу";
       toast.error(msg);
+    },
+  });
+
+  // 🔹 Мутація "Забули пароль" (тимчасово фейкова — можна буде підключити бекенд)
+  const forgotPasswordMutation = useMutation({
+    mutationFn: async (email) => {
+      // 🔸 Тут буде реальний запит, наприклад:
+      // const res = await api.post("/auth/forgot-password", { email });
+      // return res.data;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return { message: "Код для відновлення пароля відправлено на email." };
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      setShowForgotForm(false);
+      setForgotEmail("");
+    },
+    onError: () => {
+      toast.error("❌ Не вдалося надіслати email для відновлення");
     },
   });
 
@@ -37,6 +58,15 @@ export default function AuthPage() {
 
     setError("");
     loginMutation.mutate({ email, password });
+  };
+
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) {
+      toast.warning("⚠️ Введіть email для відновлення");
+      return;
+    }
+    forgotPasswordMutation.mutate(forgotEmail);
   };
 
   return (
@@ -96,8 +126,57 @@ export default function AuthPage() {
           >
             Зареєструватись
           </button>
+
+          {/* 🔹 Нова кнопка "Забули пароль?" */}
+          <button
+            type="button"
+            className="btn forgot-btn"
+            onClick={() => setShowForgotForm(true)}
+          >
+            Забули пароль?
+          </button>
         </div>
       </form>
+
+      {/* 🔸 Модалка "Забули пароль" */}
+      {showForgotForm && (
+        <div className="forgot-modal-overlay">
+          <div className="forgot-modal">
+            <h3 className="forgot-modal-title">🔑 Відновлення пароля</h3>
+
+            <form className="forgot-modal-form" onSubmit={handleForgotSubmit}>
+              <label className="forgot-modal-label">Введіть свій email:</label>
+              <input
+                type="email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                className="forgot-modal-input"
+                placeholder="example@9d.pro"
+                required
+              />
+
+              <div className="forgot-modal-buttons">
+                <button
+                  type="submit"
+                  className="btn forgot-modal-send-btn"
+                  disabled={forgotPasswordMutation.isPending}
+                >
+                  {forgotPasswordMutation.isPending
+                    ? "⏳ Надсилання..."
+                    : "Надіслати код"}
+                </button>
+                <button
+                  type="button"
+                  className="btn forgot-modal-close-btn"
+                  onClick={() => setShowForgotForm(false)}
+                >
+                  Закрити
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
