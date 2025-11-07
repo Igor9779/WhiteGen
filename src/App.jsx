@@ -38,14 +38,7 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route
-          path="/confirm"
-          element={
-            <PublicRoute>
-              <ConfirmPage />
-            </PublicRoute>
-          }
-        />
+        <Route path="/confirm" element={<ConfirmPage />} />
         <Route
           path="/reset-password"
           element={

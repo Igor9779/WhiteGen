@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -9,6 +9,12 @@ import { confirmUser } from "../../api/userApi";
 export default function ConfirmPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (!location.state?.email) {
+      navigate("/", { replace: true });
+    }
+  }, [location.state, navigate]);
 
   const initialEmail = location.state?.email || "";
 
