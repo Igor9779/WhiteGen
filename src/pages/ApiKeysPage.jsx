@@ -13,8 +13,6 @@ import {
 export default function ApiKeysPage() {
   const [clickupToken, setClickupTokenValue] = useState("");
   const [chatId, setChatId] = useState("");
-  const [showClickup, setShowClickup] = useState(false);
-  const [showTelegram, setShowTelegram] = useState(false);
   const [tokenExists, setTokenExists] = useState(false);
   const [chatExists, setChatExists] = useState(false);
 
@@ -23,8 +21,11 @@ export default function ApiKeysPage() {
     queryKey: ["clickup-token"],
     queryFn: checkClickupToken,
     onSuccess: (data) => {
-      setTokenExists(data?.exists || false);
+      console.log("✅ ClickUp check:", data);
+      setTokenExists(Boolean(data?.exists));
     },
+    refetchOnMount: true,
+    staleTime: 0,
     onError: () => toast.error("❌ Не вдалося перевірити ClickUp токен"),
   });
 
@@ -32,8 +33,11 @@ export default function ApiKeysPage() {
     queryKey: ["telegram-id"],
     queryFn: checkTelegramChatId,
     onSuccess: (data) => {
-      setChatExists(data?.exists || false);
+      console.log("✅ Telegram check:", data);
+      setChatExists(Boolean(data?.exists));
     },
+    refetchOnMount: true,
+    staleTime: 0,
     onError: () => toast.error("❌ Не вдалося перевірити Telegram Chat ID"),
   });
 
@@ -100,7 +104,7 @@ export default function ApiKeysPage() {
             <div className="password-field">
               <input
                 id="chatId"
-                type={showTelegram ? "text" : "password"}
+                type="text"
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder={
@@ -108,11 +112,6 @@ export default function ApiKeysPage() {
                 }
                 required
               />
-              <button
-                type="button"
-                className="toggle-visibility"
-                onClick={() => setShowTelegram((prev) => !prev)}
-              ></button>
             </div>
           </div>
 
@@ -145,7 +144,7 @@ export default function ApiKeysPage() {
             <div className="password-field">
               <input
                 id="clickupToken"
-                type={showClickup ? "text" : "password"}
+                type="text"
                 value={clickupToken}
                 onChange={(e) => setClickupTokenValue(e.target.value)}
                 placeholder={
@@ -153,11 +152,6 @@ export default function ApiKeysPage() {
                 }
                 required
               />
-              <button
-                type="button"
-                className="toggle-visibility"
-                onClick={() => setShowClickup((prev) => !prev)}
-              ></button>
             </div>
           </div>
 
