@@ -10,11 +10,12 @@ import RegisterPage from "./components/Auth/RegisterPage";
 import GeneratorPage from "./pages/GeneratorPage";
 import Instructions from "./pages/Instructions";
 import ApiKeysPage from "./pages/ApiKeysPage";
+import ConfirmPage from "./components/Auth/ConfirmPage";
+import ResetPasswordPage from "./components/Auth/ResetPasswordPage";
+import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import ProtectedLayout from "./components/Auth/ProtectedLayout"; // 🔹 новий layout
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ConfirmPage from "./components/Auth/ConfirmPage";
-import ProtectedRoute from "./components/Auth/ProtectedRoute";
-import ResetPasswordPage from "./components/Auth/ResetPasswordPage";
 
 function App() {
   return (
@@ -26,37 +27,24 @@ function App() {
         <Route path="/confirm" element={<ConfirmPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        {/* 🔹 Захищені сторінки — тільки для залогінених */}
+        {/* 🔹 Захищена зона (спільний ProtectedLayout) */}
         <Route
-          path="/generator"
+          path="/"
           element={
             <ProtectedRoute>
-              <GeneratorPage />
+              <ProtectedLayout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/instructions"
-          element={
-            <ProtectedRoute>
-              <Instructions />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/apikeys"
-          element={
-            <ProtectedRoute>
-              <ApiKeysPage />
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route path="generator" element={<GeneratorPage />} />
+          <Route path="instructions" element={<Instructions />} />
+          <Route path="apikeys" element={<ApiKeysPage />} />
+        </Route>
 
-        {/* 🔹 Будь-який інший шлях — редірект */}
+        {/* 🔹 Усі інші шляхи — редірект */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* 🔔 Toast Container */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
