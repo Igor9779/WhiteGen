@@ -13,6 +13,8 @@ import {
 export default function ApiKeysPage() {
   const [clickupToken, setClickupTokenValue] = useState("");
   const [chatId, setChatId] = useState("");
+  const [showClickup, setShowClickup] = useState(false);
+  const [showTelegram, setShowTelegram] = useState(false);
   const [tokenExists, setTokenExists] = useState(false);
   const [chatExists, setChatExists] = useState(false);
 
@@ -98,7 +100,7 @@ export default function ApiKeysPage() {
             <div className="password-field">
               <input
                 id="chatId"
-                type="text"
+                type={showTelegram ? "text" : "password"}
                 value={chatId}
                 onChange={(e) => setChatId(e.target.value)}
                 placeholder={
@@ -106,6 +108,13 @@ export default function ApiKeysPage() {
                 }
                 required
               />
+              <button
+                type="button"
+                className="toggle-visibility"
+                onClick={() => setShowTelegram((prev) => !prev)}
+              >
+                {showTelegram ? "🙈" : "👁️"}
+              </button>
             </div>
           </div>
 
@@ -138,7 +147,7 @@ export default function ApiKeysPage() {
             <div className="password-field">
               <input
                 id="clickupToken"
-                type="text"
+                type={showClickup ? "text" : "password"}
                 value={clickupToken}
                 onChange={(e) => setClickupTokenValue(e.target.value)}
                 placeholder={
@@ -146,6 +155,13 @@ export default function ApiKeysPage() {
                 }
                 required
               />
+              <button
+                type="button"
+                className="toggle-visibility"
+                onClick={() => setShowClickup((prev) => !prev)}
+              >
+                {showClickup ? "🙈" : "👁️"}
+              </button>
             </div>
           </div>
 
