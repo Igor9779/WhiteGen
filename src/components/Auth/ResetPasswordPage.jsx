@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./AuthPage.css";
 import { resetPassword } from "../../api/userApi";
 
@@ -10,15 +10,9 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const location = useLocation();
+
   const navigate = useNavigate();
 
-  // 🔹 якщо користувач потрапив сюди без дозволу — редірект на /
-  useEffect(() => {
-    if (!location.state?.allowReset) {
-      navigate("/", { replace: true });
-    }
-  }, [location.state, navigate]);
   // 🔹 Мутація — запит на оновлення пароля
   const resetMutation = useMutation({
     mutationFn: resetPassword,
