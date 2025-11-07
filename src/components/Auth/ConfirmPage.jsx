@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AuthPage.css";
-import { confirmUser, checkAuth } from "../../api/userApi";
+import { confirmUser } from "../../api/userApi";
 
 export default function ConfirmPage() {
   const navigate = useNavigate();
@@ -18,28 +18,10 @@ export default function ConfirmPage() {
   // 🧩 Мутація для підтвердження 2FA-коду
   const confirmMutation = useMutation({
     mutationFn: confirmUser,
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       toast.success("✅ Код підтверджено! Акаунт активовано.");
       console.log("Confirmed user:", data);
-
-      // 🕓 чекаємо, поки бекенд виставить cookie — робимо 3 спроби
-      let authenticated = false;
-
-      for (let i = 0; i < 3; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // пауза 1 секунда
-        const authCheck = await checkAuth();
-        if (authCheck?.authenticated) {
-          authenticated = true;
-          break;
-        }
-      }
-
-      if (authenticated) {
-        navigate("/generator", { replace: true });
-      } else {
-        toast.warn("⚠️ Сесія ще не оновилась. Увійдіть знову.");
-        navigate("/", { replace: true });
-      }
+      navigate("/generator", { replace: true });
     },
     onError: (err) => {
       const msg =
