@@ -1,10 +1,8 @@
-import GeneratorHeader from "../components/GeneratorHeader";
 import "./Instructions.css";
 
 export default function Instructions() {
   return (
     <>
-      <GeneratorHeader />
       <section className="instructions-page">
         <div className="container">
           <h2 className="instructions-title">Інструкція користувача</h2>

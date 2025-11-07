@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "./GeneratorPage.css";
-import GeneratorHeader from "../components/GeneratorHeader";
+
 import {
   downloadArchive,
   generateLanding,
@@ -163,8 +163,6 @@ export default function GeneratorPage() {
 
   return (
     <div className="generator-container">
-      <GeneratorHeader />
-
       <main className="generator-grid">
         {/* 🔹 Ліва колонка */}
         <section className="column column-left">

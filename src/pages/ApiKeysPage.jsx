@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "./ApiKeys.css";
-import GeneratorHeader from "../components/GeneratorHeader";
+
 import {
   setClickupToken,
   setTelegramChatId,
@@ -86,8 +86,6 @@ export default function ApiKeysPage() {
   // 🔸 Відображення
   return (
     <div className="api-page-wrapper">
-      <GeneratorHeader />
-
       <section className="api-page">
         <h2>Керування API Ключами</h2>
 
