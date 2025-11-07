@@ -1,20 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AuthPage.css";
-import { confirmUser, checkAuth } from "../../api/userApi"; // ✅ додано checkAuth
+import { confirmUser, checkAuth } from "../../api/userApi";
 
 export default function ConfirmPage() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    if (!location.state?.email) {
-      navigate("/", { replace: true });
-    }
-  }, [location.state, navigate]);
 
   const initialEmail = location.state?.email || "";
   const [email, setEmail] = useState(initialEmail);
