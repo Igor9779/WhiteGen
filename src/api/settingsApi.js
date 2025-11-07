@@ -19,11 +19,9 @@ export const setTelegramChatId = async (chatId) => {
 };
 
 export const checkClickupToken = async () => {
-  const res = await api.get(
-    "/settings/check-c-t",
-
-    { withCredentials: true }
-  );
+  console.log("🚀 Виклик checkClickupToken()");
+  const res = await api.get("/settings/check-c-t", { withCredentials: true });
+  console.log("📦 Відповідь від бекенду:", res.data);
   return res.data;
 };
 
