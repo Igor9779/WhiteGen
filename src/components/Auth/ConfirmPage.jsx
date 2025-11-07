@@ -28,20 +28,22 @@ export default function ConfirmPage() {
       toast.success("✅ Код підтверджено! Акаунт активовано.");
       console.log("Confirmed user:", data);
 
-      // 🕓 невелика затримка, щоб бекенд встиг оновити cookie
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      // 🕓 чекаємо, поки бекенд виставить cookie — робимо 3 спроби
+      let authenticated = false;
 
-      try {
+      for (let i = 0; i < 3; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // пауза 1 секунда
         const authCheck = await checkAuth();
         if (authCheck?.authenticated) {
-          navigate("/generator", { replace: true });
-        } else {
-          toast.warn("⚠️ Сесія ще не оновилась. Увійдіть знову.");
-          navigate("/", { replace: true });
+          authenticated = true;
+          break;
         }
-      } catch (err) {
-        console.error("Auth check failed:", err);
-        toast.error("❌ Помилка перевірки сесії");
+      }
+
+      if (authenticated) {
+        navigate("/generator", { replace: true });
+      } else {
+        toast.warn("⚠️ Сесія ще не оновилась. Увійдіть знову.");
         navigate("/", { replace: true });
       }
     },
