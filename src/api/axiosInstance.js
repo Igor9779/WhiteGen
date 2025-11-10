@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://gen-web-serv.onrender.com";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // 🔹 Базовий екземпляр axios
 export const api = axios.create({
