@@ -17,13 +17,8 @@ export default function GeneratorPage() {
   const [themesText, setThemesText] = useState(`[
   {
     "domain": "WhiteGen.com",
-    "name_theme": "Основна тема сайту",
+    "name_theme": "Main theme white",
     "brand_name": "WhiteGen"
-  },
-  {
-    "domain": "AIpowerGen.com",
-    "name_theme": "AI генератор сайтів",
-    "brand_name": "AIpowerGen"
   }
 ]`);
   const [showMissingTokensModal, setShowMissingTokensModal] = useState(false);
