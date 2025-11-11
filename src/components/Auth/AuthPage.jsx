@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "./AuthPage.css";
-import { loginUser } from "../../api/userApi";
+import { loginUser, sendRecoveryLink } from "../../api/userApi";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
