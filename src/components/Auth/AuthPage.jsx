@@ -67,7 +67,7 @@ export default function AuthPage() {
       toast.warning("⚠️ Введіть email для відновлення");
       return;
     }
-    forgotPasswordMutation.mutate(forgotEmail);
+    forgotPasswordMutation.mutate({ email: forgotEmail });
   };
 
   return (

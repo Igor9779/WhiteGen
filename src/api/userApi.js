@@ -39,7 +39,7 @@ export const resetPassword = async ({ password, confirmPassword }) => {
 };
 
 // 🔹 Надсилання листа для відновлення пароля
-export const sendRecoveryLink = async (email) => {
+export const sendRecoveryLink = async ({ email }) => {
   const res = await api.post("/auth/recovery-send-activation-link", { email });
   return res.data;
 };
