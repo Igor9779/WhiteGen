@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -10,22 +10,16 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [token, setToken] = useState("");
-
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  useEffect(() => {
-    const tokenResponse = searchParams.get("token");
-    setToken(tokenResponse);
-  }, [searchParams]);
+  const navigate = useNavigate();
 
   // 🔹 Мутація — надсилання нового пароля разом із токеном
   const resetMutation = useMutation({
     mutationFn: setNewPassword,
     onSuccess: () => {
       toast.success("✅ Пароль успішно змінено!");
-      navigate("/", { replace: true }); // перенаправляємо на сторінку входу
+      navigate("/", { replace: true });
     },
     onError: (err) => {
       const msg =
@@ -39,12 +33,20 @@ export default function ResetPasswordPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const tokenFromUrl = searchParams.get("token");
+
+    if (!tokenFromUrl) {
+      toast.error("❌ Відсутній токен у посиланні!");
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast.warning("⚠️ Паролі не співпадають!");
       return;
     }
 
-    resetMutation.mutate({ token, password });
+    console.log("📨 Відправляємо:", { token: tokenFromUrl, password });
+    resetMutation.mutate({ token: tokenFromUrl, password });
   };
 
   return (
