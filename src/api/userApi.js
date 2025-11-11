@@ -50,7 +50,6 @@ export const setNewPassword = async ({ token, newPassword }) => {
     token,
     newPassword,
   });
-  console.log("setNewPassword called with:", { token, password });
 
   return res.data;
 };
