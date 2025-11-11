@@ -37,3 +37,26 @@ export const resetPassword = async ({ password, confirmPassword }) => {
   });
   return res.data;
 };
+
+// 🔹 Надсилання листа для відновлення пароля
+export const sendRecoveryLink = async (email) => {
+  const res = await api.post("/auth/recovery-send-activation-link", { email });
+  return res.data;
+};
+
+// 🔹 Встановлення нового пароля за токеном
+export const setNewPassword = async ({ token, password }) => {
+  const res = await api.post("/auth/recovery-set-password", {
+    token,
+    password,
+  });
+  return res.data;
+};
+
+// 🔹 Зміна пароля без введення старого (для авторизованого користувача)
+export const changePassword = async ({ newPassword }) => {
+  const res = await api.post("/auth/change-password", {
+    newPassword,
+  });
+  return res.data;
+};

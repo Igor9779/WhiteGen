@@ -9,10 +9,14 @@ import {
   checkClickupToken,
   checkTelegramChatId,
 } from "../api/settingsApi";
+import { changePassword } from "../api/userApi";
 
 export default function ApiKeysPage() {
   const [clickupToken, setClickupTokenValue] = useState("");
   const [chatId, setChatId] = useState("");
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // 🔹 Отримуємо статуси напряму з бекенду
   const {
@@ -66,6 +70,22 @@ export default function ApiKeysPage() {
         err.response?.data?.message ||
           "❌ Помилка при збереженні Telegram Chat ID"
       ),
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: changePassword,
+    onSuccess: (data) => {
+      toast.success(data?.message || "✅ Пароль успішно змінено!");
+      setNewPassword("");
+      setConfirmPassword("");
+    },
+    onError: (err) => {
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        "❌ Не вдалося змінити пароль";
+      toast.error(msg);
+    },
   });
 
   // 🔸 Обробники
@@ -175,6 +195,63 @@ export default function ApiKeysPage() {
           ) : (
             <p className="text-warning">⚠️ Токен ще не заданий</p>
           )}
+        </form>
+        {/* 🔹 Change Password */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+
+            if (!newPassword.trim() || !confirmPassword.trim()) {
+              toast.warning("⚠️ Введіть новий пароль і підтвердження!");
+              return;
+            }
+
+            if (newPassword !== confirmPassword) {
+              toast.warning("⚠️ Паролі не співпадають!");
+              return;
+            }
+
+            changePasswordMutation.mutate({ newPassword });
+          }}
+          className="api-form"
+        >
+          <div className="api-subform">
+            <h3>🔹 Зміна пароля</h3>
+
+            <label htmlFor="newPassword">Новий пароль:</label>
+            <div className="password-field">
+              <input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Введіть новий пароль"
+                required
+              />
+            </div>
+
+            <label htmlFor="confirmPassword">Підтвердження пароля:</label>
+            <div className="password-field">
+              <input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Повторіть новий пароль"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="btn api-btn"
+            disabled={changePasswordMutation.isPending}
+          >
+            {changePasswordMutation.isPending
+              ? "⏳ Зміна..."
+              : "Змінити пароль"}
+          </button>
         </form>
       </section>
     </div>
