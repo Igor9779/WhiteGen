@@ -25,7 +25,7 @@ function App() {
         <Route path="/" element={<AuthPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/confirm" element={<ConfirmPage />} />
-        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* 🔹 Захищена зона (спільний ProtectedLayout) */}
         <Route
