@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "./AuthPage.css";
 import { setNewPassword } from "../../api/userApi";
 
@@ -10,9 +10,15 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [token, setToken] = useState("");
 
   const navigate = useNavigate();
-  const { token } = useParams(); // ⚡ Отримуємо токен із URL
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const tokenResponse = searchParams.get("token");
+    setToken(tokenResponse);
+  }, [searchParams]);
 
   // 🔹 Мутація — надсилання нового пароля разом із токеном
   const resetMutation = useMutation({
