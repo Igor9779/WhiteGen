@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./AuthPage.css";
-import { resetPassword } from "../../api/userApi";
+import { setNewPassword } from "../../api/userApi";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -12,13 +12,14 @@ export default function ResetPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
+  const { token } = useParams(); // ⚡ Отримуємо токен із URL
 
-  // 🔹 Мутація — запит на оновлення пароля
+  // 🔹 Мутація — надсилання нового пароля разом із токеном
   const resetMutation = useMutation({
-    mutationFn: resetPassword,
+    mutationFn: setNewPassword,
     onSuccess: () => {
       toast.success("✅ Пароль успішно змінено!");
-      navigate("/"); // перенаправляємо на сторінку входу
+      navigate("/", { replace: true }); // перенаправляємо на сторінку входу
     },
     onError: (err) => {
       const msg =
@@ -31,13 +32,19 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    resetMutation.mutate({ password, confirmPassword });
+
+    if (password !== confirmPassword) {
+      toast.warning("⚠️ Паролі не співпадають!");
+      return;
+    }
+
+    resetMutation.mutate({ token, password });
   };
 
   return (
     <div className="auth-container">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Відновлення пароля</h2>
+        <h2>Встановлення нового пароля</h2>
 
         <div className="form-group password-wrapper">
           <label>Новий пароль</label>

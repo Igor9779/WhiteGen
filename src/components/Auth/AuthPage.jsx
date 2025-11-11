@@ -29,22 +29,23 @@ export default function AuthPage() {
     },
   });
 
-  // 🔹 Мутація "Забули пароль" (тимчасово фейкова — можна буде підключити бекенд)
+  // 🔹 Мутація "Забули пароль"
   const forgotPasswordMutation = useMutation({
-    mutationFn: async (email) => {
-      // 🔸 Тут буде реальний запит, наприклад:
-      // const res = await api.post("/auth/forgot-password", { email });
-      // return res.data;
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return { message: "Код для відновлення пароля відправлено на email." };
-    },
+    mutationFn: sendRecoveryLink,
     onSuccess: (data) => {
-      toast.success(data.message);
+      toast.success(
+        data?.message ||
+          "✅ Лист із посиланням на відновлення пароля надіслано!"
+      );
       setShowForgotForm(false);
       setForgotEmail("");
     },
-    onError: () => {
-      toast.error("❌ Не вдалося надіслати email для відновлення");
+    onError: (err) => {
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        "❌ Не вдалося надіслати лист для відновлення";
+      toast.error(msg);
     },
   });
 
