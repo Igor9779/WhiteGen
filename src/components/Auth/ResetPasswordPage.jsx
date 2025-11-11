@@ -46,7 +46,7 @@ export default function ResetPasswordPage() {
     }
 
     console.log("📨 Відправляємо:", { token: tokenFromUrl, password });
-    resetMutation.mutate({ token: tokenFromUrl, password });
+    resetMutation.mutate({ token: tokenFromUrl, newPassword: password });
   };
 
   return (
