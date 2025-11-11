@@ -45,10 +45,10 @@ export const sendRecoveryLink = async ({ email }) => {
 };
 
 // 🔹 Встановлення нового пароля за токеном
-export const setNewPassword = async ({ token, password }) => {
+export const setNewPassword = async ({ token, newPassword }) => {
   const res = await api.post("/auth/recovery-set-password", {
     token,
-    password,
+    newPassword,
   });
   console.log("setNewPassword called with:", { token, password });
 
