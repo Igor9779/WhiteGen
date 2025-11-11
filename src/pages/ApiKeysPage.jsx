@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "./ApiKeys.css";
 
@@ -37,12 +37,15 @@ export default function ApiKeysPage() {
     staleTime: 0,
   });
 
+  const queryClient = useQueryClient();
+
   // 🔹 Мутації
   const clickupMutation = useMutation({
     mutationFn: (token) => setClickupToken(token),
     onSuccess: () => {
       toast.success("✅ ClickUp токен успішно збережено!");
       setClickupTokenValue("");
+      queryClient.invalidateQueries(["clickup-token"]);
     },
     onError: (err) =>
       toast.error(
@@ -56,6 +59,7 @@ export default function ApiKeysPage() {
     onSuccess: () => {
       toast.success("✅ Telegram Chat ID успішно збережено!");
       setChatId("");
+      queryClient.invalidateQueries(["telegram-id"]);
     },
     onError: (err) =>
       toast.error(
