@@ -14,13 +14,7 @@ import { useNavigate } from "react-router-dom";
 export default function GeneratorPage() {
   const [status, setStatus] = useState("⏳ Очікування запуску...");
   const [isDownloading, setIsDownloading] = useState(false);
-  const [themesText, setThemesText] = useState(`[
-  {
-    "domain": "WhiteGen.com",
-    "name_theme": "Main theme white",
-    "brand_name": "WhiteGen"
-  }
-]`);
+  const [themesText, setThemesText] = useState("");
   const [showMissingTokensModal, setShowMissingTokensModal] = useState(false);
   const [missingReason, setMissingReason] = useState(""); // 🔹 динамічний текст
   const navigate = useNavigate();
@@ -243,6 +237,7 @@ export default function GeneratorPage() {
           <textarea
             rows="18"
             value={themesText}
+            placeholder="[ { domain: 'example.com', name_theme: 'Theme Name', brand_name: 'Brand' }, ... ]"
             onChange={(e) => setThemesText(e.target.value)}
           />
         </section>
