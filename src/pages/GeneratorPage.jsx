@@ -237,7 +237,7 @@ export default function GeneratorPage() {
           <textarea
             rows="18"
             value={themesText}
-            placeholder="[ { domain: 'example.com', name_theme: 'Theme Name', brand_name: 'Brand' }, ... ]"
+            placeholder="[ { domain: 'example.com', name_theme: 'Theme Name', brand_name: 'Brand' }, .... ]"
             onChange={(e) => setThemesText(e.target.value)}
           />
         </section>
